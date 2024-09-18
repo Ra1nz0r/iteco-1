@@ -20,8 +20,8 @@ func (p *Player) MakeAttempts(boxes [](*Box)) bool {
 		return false
 	}
 
+	// превращаем массив коробок в массив из ID этих коробок чтобы пройти по ним
 	var allIds []int
-
 	for _, boxId := range boxes {
 		if boxId == nil {
 			continue
@@ -30,20 +30,25 @@ func (p *Player) MakeAttempts(boxes [](*Box)) bool {
 		allIds = append(allIds, boxId.id)
 	}
 
-	selected := SelectBoxesIds(&allIds)
+	// создаем массив из ID шкатулок которые Player проверит в порядке очереди
+	selected := SelectBoxesIds(&allIds, p.limitAttempts)
+	//fmt.Println("Len: ", len(*selected))
 
+	// проверяем ID выбранной коробки с ID плеера в порядке очереди
 	for _, s := range *selected {
+		p.limitAttempts--
 		fBox := FindBoxByID(s, boxes)
 
 		if fBox == nil {
+			//fmt.Println("=================BOX BY ID NOT FOUND==============")
 			return false
 		}
 
-		fmt.Println("Player id: ", p.id, "selected box id:", s)
+		//fmt.Println("Player id: ", p.id, "selected box id:", s)
 
 		if p.id == fBox.id {
 			p.found = true
-			fmt.Println("=================GOOD ATTEMPT==============")
+			//fmt.Println("=================GOOD ATTEMPT==============")
 			return true
 		}
 
@@ -66,9 +71,13 @@ func FindBoxByID(id int, boxes [](*Box)) *Box {
 	return nil
 }
 
-func SelectBoxesIds(boxes *[]int) *[]int {
+func SelectBoxesIds(boxes *[]int, count int) *[]int {
+	if count > len(*boxes) {
+		return nil
+	}
+
 	boxesSelected := IntArrShuffled(len(*boxes))
-	res := make([]int, len(*boxesSelected)/2)
+	res := make([]int, count)
 	for i := range res {
 		res[i] = (*boxesSelected)[i]
 	}
@@ -111,8 +120,7 @@ func (gS *GameSession) createPlayer(size, attemptsLimit int) {
 	shuffled := IntArrShuffled(size)
 	initedPlayers := make([](*Player), size)
 	for i, pId := range *shuffled {
-		initedPlayers[i] = &Player{}
-		initedPlayers[i].id = pId
+		initedPlayers[i] = &Player{id: pId}
 		initedPlayers[i].limitAttempts = attemptsLimit
 		initedPlayers[i].found = false
 	}
@@ -128,8 +136,17 @@ func IntArrShuffled(size int) *[]int {
 }
 
 func main() {
-	size := 10
-	attemptsPerPlayer := 5
-	session := NewGameSession(size, attemptsPerPlayer)
-	fmt.Println(session.PlaySession())
+	size := 50
+	attemptsPerPlayer := 25
+	SessionsCount := 1000
+	SuccessedCount := 0
+	for i := 0; i < SessionsCount; i++ {
+		session := NewGameSession(size, attemptsPerPlayer)
+		if session.PlaySession() {
+			SuccessedCount++
+		}
+		//fmt.Println("=================SESSION OVER==============")
+	}
+
+	fmt.Println("All tryes: ", SessionsCount, " Successed: ", SuccessedCount)
 }
