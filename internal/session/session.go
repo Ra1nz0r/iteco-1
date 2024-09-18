@@ -10,6 +10,7 @@ type GameSession struct {
 	players []player.Unit
 }
 
+// Фнукция-конструктор игровой сессии.
 func NewGameSession(size, attemptsLimit int, units []player.Unit) *GameSession {
 	gS := &GameSession{}
 	gS.boxes = box.CreateBoxes(size)
@@ -20,6 +21,7 @@ func NewGameSession(size, attemptsLimit int, units []player.Unit) *GameSession {
 	return gS
 }
 
+// Запускает игровую сессию со всеми участниками и возвращает её результат.
 func (gS *GameSession) PlaySession() bool {
 	for _, player := range gS.players {
 		if !player.MakeAttempts(gS.boxes) {

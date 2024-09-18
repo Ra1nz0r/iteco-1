@@ -1,0 +1,8 @@
+---
+version: '3'
+
+tasks:
+  run: # название задачи для запуска
+    desc: "Runs all '.go' files."
+    cmds:
+      - go run ./...

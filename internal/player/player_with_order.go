@@ -11,6 +11,7 @@ type PlayerWithOrderChoice struct {
 	found         bool
 }
 
+// Метод игрока, который делает попытки найти соответствующую шкатулку, до тех пор пока не достигнет лимита или не закончится удачно.
 func (p *PlayerWithOrderChoice) MakeAttempts(boxes [](*box.Casket)) bool {
 	if boxes == nil {
 		return false
@@ -18,17 +19,21 @@ func (p *PlayerWithOrderChoice) MakeAttempts(boxes [](*box.Casket)) bool {
 
 	checkID := p.id
 	offset := 0
+
+	// Выполняем попытки найти шкатулку в цикле.
 	for i := 0; i < p.limitAttempts; i++ {
 
 		if checkID > len(boxes)-1 {
 			return false
 		}
 
+		// Сравниваем номер игрока с номером внутри шкатулку, если находим то завершаем функцию.
 		if p.id == boxes[checkID].Id+offset {
 			p.found = true
 			return true
 		}
 
+		// Если попытка неудачная, то обновлняем переменные для цикла.
 		checkID = boxes[checkID].Id - 1
 		offset = -1
 	}
@@ -36,6 +41,7 @@ func (p *PlayerWithOrderChoice) MakeAttempts(boxes [](*box.Casket)) bool {
 	return false
 }
 
+// Создаем и инициализируем массив из игроков, добавляем им количество попыток и устанавливаем результат его игры на false.
 func CreatePlayersWithOrder(size, attemptsLimit int) []Unit {
 	shuffled := services.IntArrShuffled(size)
 	initedPlayers := make([]Unit, size)

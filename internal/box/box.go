@@ -1,8 +1,6 @@
 package box
 
 import (
-	"fmt"
-
 	"github.com/Ra1nz0r/iteco-1/internal/services"
 )
 
@@ -10,23 +8,25 @@ type Casket struct {
 	Id int
 }
 
-func FindByID(id int, boxes [](*Casket)) (*Casket, error) {
+// Поиск по массиву шкатулок, осуществляющийся по полю Id класса Casket и возвращает указатель на найденную.
+func FindByID(id int, boxes [](*Casket)) *Casket {
 	for _, b := range boxes {
 		if b == nil {
-			return nil, fmt.Errorf("failed: nil dereference")
+			return nil
 		}
 
 		if id == b.Id {
-			return b, nil
+			return b
 		}
 	}
 
-	return nil, fmt.Errorf("failed: id not found")
+	return nil
 }
 
-func SelectIds(boxes *[]int, count int) (*[]int, error) {
+// Генерирует случайный порядок шкатулок, который будет открывать игрок.
+func SelectIds(boxes *[]int, count int) *[]int {
 	if count > len(*boxes) {
-		return nil, fmt.Errorf("failed: out of bounds")
+		return nil
 	}
 
 	boxesSelected := services.IntArrShuffled(len(*boxes))
@@ -35,14 +35,13 @@ func SelectIds(boxes *[]int, count int) (*[]int, error) {
 		res[i] = (*boxesSelected)[i]
 	}
 
-	return &res, nil
+	return &res
 }
 
-// Создаем и инициализируем шкатулки в случайном порядке номеров,
-// добавляем им количество попыток и устанавливаем результат его игры на false.
-func CreateBoxes(size int) []*Casket {
-	shuffled := services.IntArrShuffled(size)
-	initedBoxes := make([](*Casket), size)
+// Создаем шкатулки, содержащие внутри номера в случайном порядке.
+func CreateBoxes(count int) []*Casket {
+	shuffled := services.IntArrShuffled(count)
+	initedBoxes := make([](*Casket), count)
 	for i, bId := range *shuffled {
 		initedBoxes[i] = &Casket{Id: bId}
 	}

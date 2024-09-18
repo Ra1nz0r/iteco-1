@@ -1,48 +1,48 @@
 package player
 
 import (
-	"log"
-
 	"github.com/Ra1nz0r/iteco-1/internal/box"
 	"github.com/Ra1nz0r/iteco-1/internal/services"
 )
 
-type PlayerWithRandomChoice struct {
+type PlayersWithRandomChoice struct {
 	id            int
 	limitAttempts int
 	found         bool
 }
 
-func (p *PlayerWithRandomChoice) MakeAttempts(boxes [](*box.Casket)) bool {
+// Метод игрока, который делает попытки найти соответствующую шкатулку, до тех пор пока не достигнет лимита или не закончится удачно.
+func (p *PlayersWithRandomChoice) MakeAttempts(boxes [](*box.Casket)) bool {
 	if boxes == nil {
 		return false
 	}
 
-	// превращаем массив коробок в массив из ID этих коробок чтобы пройти по ним
-	var allIds []int
+	// Создаёт массив с количеством элементов, равных количеству шкатулок в текущей сессии.
+	// Наполняет их номерами на которые ссылаются эти шкатулки.
+	var CurrentSessionBoxesRow []int
 	for _, boxId := range boxes {
 		if boxId == nil {
 			continue
 		}
 
-		allIds = append(allIds, boxId.Id)
+		CurrentSessionBoxesRow = append(CurrentSessionBoxesRow, boxId.Id)
 	}
 
-	// создаем массив из ID шкатулок которые Player проверит в порядке очереди
-	selected, errSelected := box.SelectIds(&allIds, p.limitAttempts)
-	if errSelected != nil {
-		log.Fatal(errSelected)
+	// Cоздаем массив из номеров шкатулок, которые игрок проверит в порядке очереди.
+	selected := box.SelectIds(&CurrentSessionBoxesRow, p.limitAttempts)
+
+	if selected == nil {
+		return false
 	}
 
-	// проверяем ID выбранной коробки с ID плеера в порядке очереди
+	// Делаем проверку каждой коробки и совпадения номера внутри неё с номером игрока.
+	// Если есть совпадение, то функция сразу завершается со значением true.
 	for _, s := range *selected {
-		p.limitAttempts--
-		res, errRes := box.FindByID(s, boxes)
-		if errRes != nil {
-			log.Fatal(errRes)
-		}
 
-		if res == nil { //////
+		p.limitAttempts--
+		res := box.FindByID(s, boxes)
+
+		if res == nil {
 			return false
 		}
 
@@ -52,17 +52,15 @@ func (p *PlayerWithRandomChoice) MakeAttempts(boxes [](*box.Casket)) bool {
 		}
 
 	}
-
 	return false
 }
 
-// Создаем и инициализируем очередь из игроков в случайном порядке номеров,
-// добавляем им количество попыток и устанавливаем результат его игры на false.
+// Создаем и инициализируем массив из игроков, добавляем им количество попыток и устанавливаем результат его игры на false.
 func CreatePlayersWithRandom(size, attemptsLimit int) []Unit {
 	shuffled := services.IntArrShuffled(size)
 	initedPlayers := make([]Unit, size)
 	for i, pId := range *shuffled {
-		initedPlayers[i] = &PlayerWithRandomChoice{id: pId, limitAttempts: attemptsLimit, found: false}
+		initedPlayers[i] = &PlayersWithRandomChoice{id: pId, limitAttempts: attemptsLimit, found: false}
 	}
 	return initedPlayers
 }
