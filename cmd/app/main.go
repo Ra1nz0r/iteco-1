@@ -5,20 +5,30 @@ import (
 
 	"github.com/Ra1nz0r/iteco-1/internal/player"
 	"github.com/Ra1nz0r/iteco-1/internal/session"
+
+	"github.com/dariubs/percent"
 )
 
 func main() {
 	size := 50
 	attemptsPerPlayer := 25
-	sessionsCount := 1000
+	sessionsCount := 10000
 
-	// Выбор варианта поведения игрока.
-	var mode player.PlayerType = player.WithOrder
+	// Выбираем вариант со случайным выбором номера шкатулок.
+	var mode player.PlayerType = player.WithRandom
 
-	Run(mode, size, attemptsPerPlayer, sessionsCount)
+	resRnd := Run(mode, size, attemptsPerPlayer, sessionsCount)
+	fmt.Printf("Процент побед при случайном выборе, сессия из %d игр: %.0f%%.\n", sessionsCount, resRnd)
+
+	// Переключаем на режим, где игроки договорились о способе выбора.
+	mode = player.WithOrder
+
+	resOrder := Run(mode, size, attemptsPerPlayer, sessionsCount)
+	fmt.Printf("Процент побед при договорённости между игроками, сессия из %d игр: %.0f%%\n", sessionsCount, resOrder)
+
 }
 
-func Run(p player.PlayerType, size, attemptsPerPlayer, sessionsCount int) {
+func Run(p player.PlayerType, size, attemptsPerPlayer, sessionsCount int) float64 {
 	if attemptsPerPlayer > size {
 		panic("GameSession initialization failed: attemptsPerPlayer > size")
 	}
@@ -48,7 +58,5 @@ func Run(p player.PlayerType, size, attemptsPerPlayer, sessionsCount int) {
 		}
 	}
 
-	diffOrder := sessionsCount - successedCount
-
-	fmt.Printf("Successed: %d,\nFailed: %d,\nTotal: %d.\n", successedCount, diffOrder, sessionsCount)
+	return percent.PercentOf(successedCount, sessionsCount)
 }
