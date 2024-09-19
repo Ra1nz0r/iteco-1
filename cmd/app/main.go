@@ -17,14 +17,14 @@ func main() {
 	// Выбираем вариант со случайным выбором номера шкатулок.
 	var mode player.PlayerType = player.WithRandom
 
-	resRnd := Run(mode, size, attemptsPerPlayer, sessionsCount)
-	fmt.Printf("Процент побед при случайном выборе, сессия из %d игр: %.0f%%.\n", sessionsCount, resRnd)
+	res := Run(mode, size, attemptsPerPlayer, sessionsCount)
+	fmt.Printf("Процент побед при случайном выборе, сессия из %d игр: %.0f%%.\n", sessionsCount, res)
 
 	// Переключаем на режим, где игроки договорились о способе выбора.
 	mode = player.WithOrder
 
-	resOrder := Run(mode, size, attemptsPerPlayer, sessionsCount)
-	fmt.Printf("Процент побед при договорённости между игроками, сессия из %d игр: %.0f%%\n", sessionsCount, resOrder)
+	res = Run(mode, size, attemptsPerPlayer, sessionsCount)
+	fmt.Printf("Процент побед при договорённости между игроками, сессия из %d игр: %.0f%%\n", sessionsCount, res)
 
 }
 
