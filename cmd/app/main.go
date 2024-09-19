@@ -37,7 +37,7 @@ func Run(p player.PlayerType, size, attemptsPerPlayer, sessionsCount int) {
 			playersArr = player.CreatePlayersWithOrder(size, attemptsPerPlayer)
 		}
 
-		session := session.NewGameSession(size, attemptsPerPlayer, playersArr)
+		session := session.NewGameSession(size, playersArr)
 
 		if session == nil {
 			panic("GameSession initialization failed")

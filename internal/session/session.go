@@ -11,13 +11,16 @@ type GameSession struct {
 }
 
 // Фнукция-конструктор игровой сессии.
-func NewGameSession(size, attemptsLimit int, units []player.Unit) *GameSession {
-	gS := &GameSession{}
-	gS.boxes = box.CreateBoxes(size)
-	gS.players = units
+func NewGameSession(size int, units []player.Unit) *GameSession {
+	gS := &GameSession{
+		boxes:   box.CreateBoxes(size),
+		players: units,
+	}
+
 	if gS.boxes == nil || gS.players == nil {
 		return nil
 	}
+
 	return gS
 }
 
