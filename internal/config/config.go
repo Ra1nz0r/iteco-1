@@ -10,8 +10,7 @@ var (
 	DefSessionsCount     = 10000 // стандартный размер сессии
 )
 
-// Создаёт флаги для запуска сервера, если в терминале переданы переменные окружения,
-// то приоритет будет отдаваться им.
+// Создаёт флаги для изменения стандартных параметров.
 func ServerFlags() {
 	flag.IntVar(&DefSize, "si", DefSize, "number of sessions")
 	flag.IntVar(&DefAttemptsPerPlayer, "a", DefAttemptsPerPlayer, "number of sessions")
