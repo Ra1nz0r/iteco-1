@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	cfg "github.com/Ra1nz0r/iteco-1/internal/config"
+	"github.com/Ra1nz0r/iteco-1/internal/logger"
 	"github.com/Ra1nz0r/iteco-1/internal/player"
 	"github.com/Ra1nz0r/iteco-1/internal/session"
 
@@ -11,29 +13,28 @@ import (
 )
 
 func main() {
-	size := 50
-	attemptsPerPlayer := 25
-	sessionsCount := 10000
+	if errLog := logger.Initialize(); errLog != nil {
+		log.Fatal(errLog)
+	}
 
 	// Выбираем вариант со случайным выбором номера шкатулок.
 	var mode player.PlayerType = player.WithRandom
 
-	res, errRes := Run(mode, size, attemptsPerPlayer, sessionsCount)
+	res, errRes := Run(mode, cfg.DefSize, cfg.DefAttemptsPerPlayer, cfg.DefSessionsCount)
 	if errRes != nil {
-		log.Fatal(fmt.Errorf("failed: %w", errRes))
-
+		logger.Zap.Fatal(fmt.Errorf("failed: %w", errRes))
 	}
-	fmt.Printf("Процент побед при случайном выборе, сессия из %d игр: %.0f%%.\n", sessionsCount, res)
+	fmt.Printf("Процент побед при случайном выборе, сессия из %d игр: %.0f%%.\n", cfg.DefSessionsCount, res)
 
 	// Переключаем на режим, где игроки договорились о способе выбора.
 	mode = player.WithOrder
 
-	res, errRes = Run(mode, size, attemptsPerPlayer, sessionsCount)
+	res, errRes = Run(mode, cfg.DefSize, cfg.DefAttemptsPerPlayer, cfg.DefSessionsCount)
 	if errRes != nil {
-		log.Fatal(fmt.Errorf("failed: %w", errRes))
+		logger.Zap.Fatal(fmt.Errorf("failed: %w", errRes))
 	}
 
-	fmt.Printf("Процент побед при договорённости между игроками, сессия из %d игр: %.0f%%\n", sessionsCount, res)
+	fmt.Printf("Процент побед при договорённости между игроками, сессия из %d игр: %.0f%%\n", cfg.DefSessionsCount, res)
 
 }
 
