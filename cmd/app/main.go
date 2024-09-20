@@ -13,6 +13,8 @@ import (
 )
 
 func main() {
+	cfg.ServerFlags()
+
 	if errLog := logger.Initialize(); errLog != nil {
 		log.Fatal(errLog)
 	}
