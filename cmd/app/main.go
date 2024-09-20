@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/Ra1nz0r/iteco-1/internal/player"
 	"github.com/Ra1nz0r/iteco-1/internal/session"
@@ -17,20 +18,28 @@ func main() {
 	// Выбираем вариант со случайным выбором номера шкатулок.
 	var mode player.PlayerType = player.WithRandom
 
-	res := Run(mode, size, attemptsPerPlayer, sessionsCount)
+	res, errRes := Run(mode, size, attemptsPerPlayer, sessionsCount)
+	if errRes != nil {
+		log.Fatal(fmt.Errorf("failed: %w", errRes))
+
+	}
 	fmt.Printf("Процент побед при случайном выборе, сессия из %d игр: %.0f%%.\n", sessionsCount, res)
 
 	// Переключаем на режим, где игроки договорились о способе выбора.
 	mode = player.WithOrder
 
-	res = Run(mode, size, attemptsPerPlayer, sessionsCount)
+	res, errRes = Run(mode, size, attemptsPerPlayer, sessionsCount)
+	if errRes != nil {
+		log.Fatal(fmt.Errorf("failed: %w", errRes))
+	}
+
 	fmt.Printf("Процент побед при договорённости между игроками, сессия из %d игр: %.0f%%\n", sessionsCount, res)
 
 }
 
-func Run(p player.PlayerType, size, attemptsPerPlayer, sessionsCount int) float64 {
-	if attemptsPerPlayer > size {
-		panic("GameSession initialization failed: attemptsPerPlayer > size")
+func Run(p player.PlayerType, size, attemptsPerPlayer, sessionsCount int) (float64, error) {
+	if attemptsPerPlayer > size || size <= 0 {
+		return 0, fmt.Errorf("incorrect number of players or chances of attempts are greater than players")
 	}
 
 	var playersArr []player.Unit
@@ -47,16 +56,20 @@ func Run(p player.PlayerType, size, attemptsPerPlayer, sessionsCount int) float6
 			playersArr = player.CreatePlayersWithOrder(size, attemptsPerPlayer)
 		}
 
-		session := session.NewGameSession(size, playersArr)
-
-		if session == nil {
-			panic("GameSession initialization failed")
+		session, errSess := session.NewGameSession(size, playersArr)
+		if errSess != nil {
+			return 0, fmt.Errorf("%w", errSess)
 		}
 
-		if session.PlaySession() {
+		ok, errPS := session.PlaySession()
+		if errPS != nil {
+			return 0, fmt.Errorf("%w", errPS)
+		}
+
+		if ok {
 			successedCount++
 		}
 	}
 
-	return percent.PercentOf(successedCount, sessionsCount)
+	return percent.PercentOf(successedCount, sessionsCount), nil
 }

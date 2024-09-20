@@ -1,6 +1,8 @@
 package session
 
 import (
+	"fmt"
+
 	"github.com/Ra1nz0r/iteco-1/internal/box"
 	"github.com/Ra1nz0r/iteco-1/internal/player"
 )
@@ -11,25 +13,30 @@ type GameSession struct {
 }
 
 // Фнукция-конструктор игровой сессии.
-func NewGameSession(size int, units []player.Unit) *GameSession {
+func NewGameSession(size int, units []player.Unit) (*GameSession, error) {
 	gS := &GameSession{
 		boxes:   box.CreateBoxes(size),
 		players: units,
 	}
 
 	if gS.boxes == nil || gS.players == nil {
-		return nil
+		return nil, fmt.Errorf("failed: nil dereference")
 	}
 
-	return gS
+	return gS, nil
 }
 
 // Запускает игровую сессию со всеми участниками и возвращает её результат.
-func (gS *GameSession) PlaySession() bool {
+func (gS *GameSession) PlaySession() (bool, error) {
 	for _, player := range gS.players {
-		if !player.MakeAttempts(gS.boxes) {
-			return false
+		ok, err := player.MakeAttempts(gS.boxes)
+		if err != nil {
+			return false, fmt.Errorf("%w", err)
+		}
+
+		if !ok {
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }

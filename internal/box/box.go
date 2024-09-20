@@ -1,6 +1,8 @@
 package box
 
 import (
+	"fmt"
+
 	"github.com/Ra1nz0r/iteco-1/internal/services"
 )
 
@@ -9,24 +11,24 @@ type Casket struct {
 }
 
 // Поиск по массиву шкатулок, осуществляющийся по полю Id класса Casket и возвращает указатель на найденную.
-func FindByID(id int, boxes [](*Casket)) *Casket {
+func FindByID(id int, boxes [](*Casket)) (*Casket, error) {
 	for _, b := range boxes {
 		if b == nil {
-			return nil
+			return nil, fmt.Errorf("nil dereference")
 		}
 
 		if id == b.Id {
-			return b
+			return b, nil
 		}
 	}
 
-	return nil
+	return nil, fmt.Errorf("casket not found")
 }
 
 // Генерирует случайный порядок шкатулок, который будет открывать игрок.
-func SelectIds(boxes *[]int, count int) *[]int {
+func SelectIds(boxes *[]int, count int) (*[]int, error) {
 	if count > len(*boxes) {
-		return nil
+		return nil, fmt.Errorf("count out of bounds")
 	}
 
 	boxesSelected := services.IntArrShuffled(len(*boxes))
@@ -35,7 +37,7 @@ func SelectIds(boxes *[]int, count int) *[]int {
 		res[i] = (*boxesSelected)[i]
 	}
 
-	return &res
+	return &res, nil
 }
 
 // Создаем шкатулки, содержащие внутри номера в случайном порядке.

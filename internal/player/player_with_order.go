@@ -1,6 +1,8 @@
 package player
 
 import (
+	"fmt"
+
 	"github.com/Ra1nz0r/iteco-1/internal/box"
 	"github.com/Ra1nz0r/iteco-1/internal/services"
 )
@@ -12,25 +14,24 @@ type PlayerWithOrderChoice struct {
 }
 
 // Метод игрока, который делает попытки найти соответствующую шкатулку, до тех пор пока не достигнет лимита или не закончится удачно.
-func (p *PlayerWithOrderChoice) MakeAttempts(boxes [](*box.Casket)) bool {
+func (p *PlayerWithOrderChoice) MakeAttempts(boxes [](*box.Casket)) (bool, error) {
 	if boxes == nil {
-		return false
+		return false, fmt.Errorf("nil dereference")
 	}
 
-	checkID := p.id
-	offset := 0
+	checkID, offset := p.id, 0
 
 	// Выполняем попытки найти шкатулку в цикле.
 	for i := 0; i < p.limitAttempts; i++ {
 
 		if checkID > len(boxes)-1 {
-			return false
+			return false, fmt.Errorf("checkID out of bounds")
 		}
 
 		// Сравниваем номер игрока с номером внутри шкатулку, если находим то завершаем функцию.
 		if p.id == boxes[checkID].Id+offset {
 			p.found = true
-			return true
+			return true, nil
 		}
 
 		// Если попытка неудачная, то обновлняем переменные для цикла.
@@ -38,7 +39,7 @@ func (p *PlayerWithOrderChoice) MakeAttempts(boxes [](*box.Casket)) bool {
 		offset = -1
 	}
 
-	return false
+	return false, nil
 }
 
 // Создаем и инициализируем массив из игроков, добавляем им количество попыток и устанавливаем результат его игры на false.
