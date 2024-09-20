@@ -12,8 +12,8 @@ var (
 
 // Создаёт флаги для изменения стандартных параметров.
 func ServerFlags() {
-	flag.IntVar(&DefSize, "si", DefSize, "number of sessions")
-	flag.IntVar(&DefAttemptsPerPlayer, "a", DefAttemptsPerPlayer, "number of sessions")
-	flag.IntVar(&DefSessionsCount, "ss", DefSessionsCount, "number of sessions")
+	flag.IntVar(&DefSize, "si", DefSize, "changes the number of size")
+	flag.IntVar(&DefAttemptsPerPlayer, "a", DefAttemptsPerPlayer, "changes the number of attempts")
+	flag.IntVar(&DefSessionsCount, "ss", DefSessionsCount, "changes the number of sessions")
 	flag.Parse()
 }
